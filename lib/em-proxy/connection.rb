@@ -37,6 +37,18 @@ module EventMachine
 
           # guard for "unbound" servers
           servers = servers.collect {|s| @servers[s]}.compact
+
+        elsif processed.is_a? Hash
+          # add support for sending modified request to specific servers
+          servers = processed.keys
+          servers = servers.collect {|s| @servers[s]}.compact
+
+          servers.each do |s|
+            s.send_data processed[s.name] unless processed[s.name].nil?
+          end
+          
+          return
+  
         else
           data = processed
           servers ||= @servers.values.compact
